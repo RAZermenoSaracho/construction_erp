@@ -1,0 +1,113 @@
+{% from "bootstrap5/form.html" import render_form %} {% block content %} 
+{% include "header.html" %}
+
+<!-- Page Header-->
+<header class="masthead" style="background-image: url('{{project.img}}'); background-size: cover;">
+  <div class="container position-relative px-4 px-lg-5">
+    <div class="row gx-4 gx-lg-5 justify-content-center">
+      <div class="col-md-10 col-lg-8 col-xl-7">
+        <div class="post-heading">
+          <h1>{{ project.name }}</h1>
+          <h2 class="subheading">{{ project.slogan }}</h2>
+          <span class="meta"
+            >By
+            <a href="{{ url_for('get_all_projects') }}">{{ company }}</a>
+            on {{ project.start_date }} - {{ project.end_date }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Post Content -->
+<article>
+  <div class="container px-4 px-lg-5">
+    <div class="row gx-4 gx-lg-5 justify-content-center">
+      <div class="col-md-10 col-lg-8 col-xl-7">
+        <h3 class="mb-5">Clients' content</h3>
+        {{ project.description | safe }}
+        <div>
+          CARROUSEL OF RENDERS PENDING
+        </div>
+        <div>
+          VIDEOS PENDING
+        </div>
+        {% if logged_in: %}
+        <div>
+          <h3 class="mb-5 mt-5">Users' only content</h3>
+          <ul>
+            <li>plans</li>
+            <li>diagrams</li>
+            <li>invoices</li>
+            <li>notes</li>
+            <li>payroll</li>
+            <li>licenses_and_permits</li>
+            <li>laboratory_results</li>
+            <li>contracts</li>
+            <li>advances</li>
+          </ul>          
+        </div>
+          {% if is_admin: %}
+          <div class="d-flex justify-content-end mb-4">
+            <a class="btn btn-primary float-right" href="{{url_for('edit_project', project_id=project.id)}}">Edit Project</a>
+          </div>
+          {% endif %}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</article>
+<!-- Main Content-->
+<div class="container px-4 px-lg-5">
+  <div class="row gx-4 gx-lg-5 justify-content-center">
+    <div class="col-md-10 col-lg-8 col-xl-7">
+      <h3 class="mb-5">Stages</h3>
+      <!-- Post preview-->
+      {% if stages: %}
+        {% for stage in stages: %}
+        <div class="project-container">
+          <div class="post-preview">
+            <a href="{{ url_for('show_stage', project_name=project.name.lower().replace(' ', '_'), stage_name=stage.name.lower().replace(' ', '_')) }}">
+              <h4>{{ stage.name }}</h4>
+              <h5 class="post-subtitle">{{ stage.slogan }}</h5>
+            </a>
+            <p class="post-meta">
+              By
+              <a href="{{ url_for('get_all_projects')}}">{{ company }}</a><br>
+              {{stage.start_date}} - {{stage.end_date}}
+              {% if logged_in and is_admin: %}
+              <a href="{{url_for('delete_stage', stage_id=stage.id) }}">✘</a>
+              {% endif %}
+            </p>
+          </div>
+          <div><a href="{{ url_for('show_stage', project_name=project.name.lower().replace(' ', '_'), stage_name=stage.name.lower().replace(' ', '_')) }}"><img src="{{stage.img}}" alt="" class="project-image"></a></div>
+        </div>        
+        <!-- Divider-->
+        <hr class="my-4" />
+        {% endfor %}
+      {% else: %}
+      <div class="post-preview">
+          <strong>There are no stages defined for this project.</strong>
+      </div>
+      <!-- Divider-->
+      <hr class="my-4" />
+      {% endif %}
+
+      <!-- New Post -->
+      <!-- TODO: Only show Create Post button if user id is 1 (admin user) -->
+      {% if logged_in and is_admin: %}
+      <div class="d-flex justify-content-end mb-4">
+        <a
+          class="btn btn-primary float-right"
+          href="{{url_for('add_new_stage', project_id=project.id)}}"
+          >Create a new stage for this project!</a
+        >
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% include "footer.html" %}
+{% endblock %}

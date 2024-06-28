@@ -1,0 +1,101 @@
+{% from "bootstrap5/form.html" import render_form, render_field %}
+{% block content %}
+{% include "header.html" %}
+
+<!-- Page Header-->
+<header class="masthead" style="padding-top: 80px; padding-bottom: 0;">
+  <div class="container position-relative px-4 px-lg-5">
+    <div class="row gx-4 gx-lg-5 justify-content-center">
+      <div class="col-md-10 col-lg-8 col-xl-7">
+        <div class="site-heading">
+          <h1>{{ page_tittle }}</h1>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+<!-- Main Content-->
+<div class="container px-4 px-lg-5">
+  <div class="row gx-4 gx-lg-5 justify-content-center">
+    <div style="padding: 5px;">
+      <div style="padding-bottom: 2%;"><h4>Filtering Options</h4></div>
+      <form method="POST">
+        <div style="display: flex; justify-content: end; align-items: top;">
+          <div style="flex: 1; padding: 5px;">
+            {{ render_field(filtering_form.column) }}
+          </div>
+          <div style="flex: 2; padding: 5px;">
+            {{ render_field(filtering_form.condition) }}
+          </div>
+          <div style="flex: 6; padding: 5px;">
+            {{ render_field(filtering_form.input) }}
+          </div>
+          <div style="flex: 3; padding: 5px;">
+            {{ render_field(filtering_form.logical_operator) }}
+          </div>
+          <div style="flex: 1; padding: 5px;">
+            {{ render_field(filtering_form.add_filter) }}
+          </div>
+        </div>
+        <div style="display: flex; justify-content: end; align-items: top;">
+          <div style="flex: 11; padding: 5px;">
+            {{ render_field(filtering_form.queries) }}
+          </div>
+          <div style="flex: 1; padding: 5px;">
+            {{ render_field(filtering_form.apply) }}
+          </div>
+        </div>
+      </form>
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          {% for message in messages %}
+            <p>{{ message | safe }}</p>  
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+    </div>
+    {% if not table.empty %}
+    <table class="table">
+      <thead>
+        <tr>
+          {% for column in columns %}
+          <th>
+            <div class="row">
+              <div class="col-auto">
+                {{ column.capitalize() }}
+              </div>
+              <div class="col-auto">
+                <form method="POST">
+                  <input type="hidden" name="sort_column" value="{{ column }}">
+                  {% if sort_column == column and sort_direction == 'asc' %}
+                  <button type="submit" class="btn btn-primary btn-sm" name="sort_direction" value="desc">▲</button>
+                  {% elif sort_column == column and sort_direction == 'desc' %}
+                  <button type="submit" class="btn btn-primary btn-sm" name="sort_direction" value="asc">▼</button>
+                  {% else %}
+                  <button type="submit" class="btn btn-primary btn-sm" name="sort_direction" value="asc">—</button>
+                  {% endif %}
+                </form>
+              </div>
+            </div>
+          </th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for index, row in table.iterrows() %}
+        <tr>
+          {% for column in columns %}
+          <td><a href="{{ url_for('show_profile', user_id=row.id)}}">{{ row[column] }}</a></td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div>No elements found</div>
+    {% endif %}
+  </div>
+</div>
+
+{% include "footer.html" %}
+{% endblock %}

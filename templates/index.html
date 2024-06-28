@@ -1,0 +1,73 @@
+{% include "header.html" %}
+
+<!-- Page Header-->
+<header class="masthead" style="background-image: url('../static/assets/img/I.1.png'); background-size: cover;">
+  <div class="container position-relative px-4 px-lg-5">
+    <div class="row gx-4 gx-lg-5 justify-content-center">
+      <div class="col-md-10 col-lg-8 col-xl-7">
+        <div class="site-heading">
+          <h1>{{ company }}</h1>
+          <span class="subheading">{{ slogan }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+<!-- Main Content-->
+<div class="container px-4 px-lg-5">
+  <div class="row gx-4 gx-lg-5 justify-content-center">
+    <div class="col-md-10 col-lg-8 col-xl-7">
+      <!-- Post preview-->
+      {% if all_projects: %}
+        {% for project in all_projects: %}
+        <div class="project-container">
+          <div class="post-preview">
+            <a href="{{ url_for('show_project', project_name=project.name.lower().replace(' ', '_')) }}">
+              <h2 class="post-title">{{ project.name }}</h2>
+              <h3 class="post-subtitle">{{ project.slogan }}</h3>
+            </a>
+            <p class="post-meta">
+              By
+              <a href="{{ url_for('get_all_projects')}}">{{ company }}</a><br>
+              {{project.start_date}} - {{project.end_date}}
+              {% if logged_in and is_admin: %}
+              <a href="{{url_for('delete_project', project_id=project.id) }}">✘</a>
+              {% endif %}
+            </p>
+          </div>
+          <div><a href="{{ url_for('show_project', project_name=project.name.lower().replace(' ', '_')) }}"><img src="{{project.img}}" alt="" class="project-image"></a></div>
+        </div>        
+        <!-- Divider-->
+        <hr class="my-4" />
+        {% endfor %}
+      {% else: %}
+      <div class="post-preview">
+        <a href="#">
+          <h2 class="post-title">There are no projects yet.</h2>
+        </a>
+        <p class="post-meta">
+          By
+          <a href="#">{{ company }}</a>
+          on N/A
+        </p>
+      </div>
+      <!-- Divider-->
+      <hr class="my-4" />
+      {% endif %}
+
+      <!-- New Post -->
+      <!-- TODO: Only show Create Post button if user id is 1 (admin user) -->
+      {% if logged_in and is_admin: %}
+      <div class="d-flex justify-content-end mb-4">
+        <a
+          class="btn btn-primary float-right"
+          href="{{url_for('add_new_project')}}"
+          >Create a new project!</a
+        >
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% include "footer.html" %}

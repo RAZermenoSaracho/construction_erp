@@ -1,0 +1,81 @@
+{% from "bootstrap5/form.html" import render_form, render_field %} {% block content %}
+{% include "header.html" %}
+
+<!-- Page Header-->
+{% if 'edit' in route: %}
+<form method="POST" enctype="multipart/form-data">
+  <header class="masthead">
+    <div class="container position-relative px-4 px-lg-5">
+      <div class="row gx-4 gx-lg-5 justify-content-center">
+        <div class="col-md-10 col-lg-8 col-xl-7">
+          <div class="site-heading">
+            {{ render_field(form.name) }}
+            {% if is_admin: %}
+            {{ render_field(form.is_admin) }}
+            {{ render_field(form.gram) }}
+            {{ render_field(form.position) }}
+            {% else: %}
+            <span class="subheading">{{ requested_user.position.name }}</span>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+  <!-- Main Content-->
+  <div class="container py-5">
+    <div class="row py-0">
+        <div>
+          <img src="{{ requested_user.profile_picture }}" height="250"/>
+          {{ render_field(form.profile_picture) }}
+        </div>
+        <div class="col-xl-10 px-3">
+            {{ ckeditor.load() }} {{ ckeditor.config(name='about') }}
+            {{ render_field(form.about) }}
+        </div>
+        <div style="display: flex; justify-content: center; align-items: top;">
+          <div style="flex: 6; padding: 5px;">
+            {{ render_field(form.email) }}
+          </div>
+          <div style="flex: 6; padding: 5px;">
+            {{ render_field(form.password) }}
+          </div>
+        </div>
+        <div class="d-flex justify-content-end mb-4">
+          {{ render_field(form.submit) }}
+        </div>
+    </div>
+  </div>
+  {{ form.csrf_token }}
+</form>
+{% else: %}
+<header class="masthead">
+  <div class="container position-relative px-4 px-lg-5">
+    <div class="row gx-4 gx-lg-5 justify-content-center">
+      <div class="col-md-10 col-lg-8 col-xl-7">
+        <div class="site-heading">
+          <div><img src="{{ requested_user.profile_picture }}" height="250"/></div>
+          <h1>{{ requested_user.name }}</h1>
+          <span class="subheading">{{ requested_user.position.name }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+<!-- Main Content-->
+<div class="container py-5">
+  <div class="row py-0">
+      <div class="col-xl-10 px-3">
+          <h3>About me:</h3>
+          {{requested_user.about | safe }}
+      </div>
+      {% if is_admin or requested_user == user: %}
+        <div class="d-flex justify-content-end mb-4">
+          <a class="btn btn-primary float-right" href="{{url_for('edit_profile', user_id=requested_user.id)}}">Edit Profile</a>
+        </div>
+      {% endif %}
+  </div>
+</div>
+{% endif %}
+
+{% include "footer.html" %} {% endblock %}
