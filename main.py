@@ -159,7 +159,7 @@ def edit_profile(user_id):
                 if file_ext not in app.config['USER_PP_UPLOAD_EXTENSIONS']:
                     abort(400)
                 else:
-                    filename = secure_filename(f"{user.gram.lower()}_pp{file_ext}")
+                    filename = secure_filename(f"{user_to_edit.gram.lower()}_pp{file_ext}")
                     file.save(os.path.join(app.config['USER_PP_UPLOAD_PATH'], filename))
                     img_path = os.path.join('..', 'static', 'assets', 'users', user_name, 'profile_picture', filename)
             else:
@@ -638,6 +638,23 @@ def get_all_projects():
         user=current_user)
 
 
+
+# List of subdirectories to be created within each project and stage directory
+SUBDIRECTORIES = [
+    'img',
+    'renders',
+    'plans',
+    'diagramas',
+    'invoices',
+    'notes',
+    'payroll',
+    'licencies_and_permits',
+    'laboratory_results',
+    'contracts',
+    'advances'
+]
+
+# PROJECTS MANAGEMENT
 @app.route("/project/<project_name>", methods=['GET', 'POST'])
 def show_project(project_name):
     requested_project = Project.query.filter_by(name=project_name.replace('_', ' ').title()).first()
@@ -664,84 +681,7 @@ def show_project(project_name):
         )
 
 
-@app.route("/project/<project_name>/stage/<stage_name>", methods=['GET', 'POST'])
-def show_stage(project_name, stage_name):
-    project_name_title = project_name.replace('_', ' ').title()
-    stage_name_title = stage_name.replace('_', ' ').title()
-    
-    # Query the project and the stage
-    requested_project = Project.query.filter_by(name=project_name_title).first()
-    requested_stage = Stage.query.filter_by(project_id=requested_project.id, name=stage_name_title).first()
-    
-    if not requested_project or not requested_stage:
-        abort(404)
-    
-    phases = Phase.query.filter_by(stage_id=requested_stage.id).all()
-    
-    # Convert the phases to a list of dictionaries
-    data = []
-    for phase in phases:
-        phase_dict = {
-            'id': phase.id,
-            'code': phase.code,
-            'name': phase.name,
-            'description': phase.description
-        }
-        data.append(phase_dict)
-    
-    # Convert the list of dictionaries to a Pandas DataFrame
-    phases_table = pd.DataFrame(data)
-    
-    self_filtering_table = SelfFilteringTable(
-        df=phases_table, 
-        columns=['id', 'code', 'name', 'description'],
-        column_types=[int, str, str, str]
-    )
-    
-    is_admin = False
-    if current_user.is_authenticated:
-        # Get the user from the database using the user ID stored in current_user
-        user = User.query.get(current_user.get_id())
-        # Check if the user is an admin
-        is_admin = user.is_admin
 
-    return render_template(
-        "stage.html", 
-        company=COMPANY, 
-        slogan=COMPANY_SLOGAN, 
-        date=DATE, 
-        project=requested_project, 
-        stage=requested_stage, 
-        filtering_form=self_filtering_table.form,
-        table=self_filtering_table.table, 
-        filters_applied=len(self_filtering_table.filtering_inputs) > 0, 
-        logged_in=current_user.is_authenticated, 
-        is_admin=is_admin, 
-        user=current_user, 
-        sort_column=self_filtering_table.sort_column, 
-        sort_direction=self_filtering_table.sort_direction, 
-        columns=self_filtering_table.columns,
-        col_span=self_filtering_table.df.shape[1]
-    )
-
-
-
-# List of subdirectories to be created within each project and stage directory
-SUBDIRECTORIES = [
-    'img',
-    'renders',
-    'plans',
-    'diagramas',
-    'invoices',
-    'notes',
-    'payroll',
-    'licencies_and_permits',
-    'laboratory_results',
-    'contracts',
-    'advances'
-]
-
-# PROJECTS MANAGEMENT
 @app.route("/new_project", methods=["GET", "POST"])
 @admin_required  # Require admin access in addition to login
 def add_new_project():
@@ -920,6 +860,68 @@ def delete_project(project_id):
 
 
 # STAGES MANAGEMENT
+@app.route("/project/<project_name>/stage/<stage_name>", methods=['GET', 'POST'])
+def show_stage(project_name, stage_name):
+    project_name_title = project_name.replace('_', ' ').title()
+    stage_name_title = stage_name.replace('_', ' ').title()
+    
+    # Query the project and the stage
+    requested_project = Project.query.filter_by(name=project_name_title).first()
+    requested_stage = Stage.query.filter_by(project_id=requested_project.id, name=stage_name_title).first()
+    
+    if not requested_project or not requested_stage:
+        abort(404)
+    
+    phases = Phase.query.filter_by(stage_id=requested_stage.id).all()
+    
+    # Convert the phases to a list of dictionaries
+    data = []
+    for phase in phases:
+        phase_dict = {
+            'id': phase.id,
+            'code': phase.code,
+            'name': phase.name,
+            'description': phase.description
+        }
+        data.append(phase_dict)
+    
+    # Convert the list of dictionaries to a Pandas DataFrame
+    phases_table = pd.DataFrame(data)
+    
+    self_filtering_table = SelfFilteringTable(
+        df=phases_table, 
+        columns=['id', 'code', 'name', 'description'],
+        column_types=[int, str, str, str]
+    )
+    
+    is_admin = False
+    if current_user.is_authenticated:
+        # Get the user from the database using the user ID stored in current_user
+        user = User.query.get(current_user.get_id())
+        # Check if the user is an admin
+        is_admin = user.is_admin
+
+    return render_template(
+        "stage.html", 
+        company=COMPANY, 
+        slogan=COMPANY_SLOGAN, 
+        date=DATE, 
+        project=requested_project, 
+        stage=requested_stage, 
+        filtering_form=self_filtering_table.form,
+        table=self_filtering_table.table, 
+        filters_applied=len(self_filtering_table.filtering_inputs) > 0, 
+        logged_in=current_user.is_authenticated, 
+        is_admin=is_admin, 
+        user=current_user, 
+        sort_column=self_filtering_table.sort_column, 
+        sort_direction=self_filtering_table.sort_direction, 
+        columns=self_filtering_table.columns,
+        col_span=self_filtering_table.df.shape[1]
+    )
+
+
+
 @app.route("/new_stage/<int:project_id>", methods=["GET", "POST"])
 @admin_required  # Require admin access in addition to login
 def add_new_stage(project_id):
@@ -1099,6 +1101,7 @@ def delete_stage(stage_id):
 
 
 
+# PHASES MANAGEMENT
 @app.route("/new_phase/<int:stage_id>", methods=["GET", "POST"])
 @admin_required  # Require admin access in addition to login
 def add_new_phase(stage_id):
@@ -1198,6 +1201,8 @@ def edit_phase(phase_id):
     )
 
 
+
+# GENERAL PAGES
 @app.route("/about")
 def about():
     return render_template(
