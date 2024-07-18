@@ -1,6 +1,7 @@
 secrets.txt
 static/assets/projects/
 static/assets/users/
+static/assets/profile_pictures/
 
 # This is a gitignore file. Folders and file types in here will not
 # be added to version control and will not be uploaded to Github.
