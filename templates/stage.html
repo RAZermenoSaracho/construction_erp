@@ -84,8 +84,13 @@
         {% endwith %}
       </div>
 
-      <div class="d-flex justify-content-end mb-4">
-        <a class="btn btn-primary float-right" href="{{url_for('add_new_phase', stage_id=stage.id)}}">Create a new phase for this stage!</a>
+      <div style="display: flex; justify-content: space-between; width: 100%; padding: 0 50px;">
+        <div class="d-flex justify-content-end mb-4">
+            <a class="btn btn-primary" href="{{url_for('add_new_phase', stage_id=stage.id)}}">Create a new phase for this stage!</a>
+        </div>
+        <div class="d-flex justify-content-start mb-4">
+            <a class="btn btn-primary" href="{{url_for('show_concepts', project_name=project.name.lower().replace(' ', '_'), stage_name=stage.name.lower().replace(' ', '_')) }}">Show full Concepts Catalog</a>
+        </div>
       </div>
       
       <table class="table">
@@ -130,10 +135,6 @@
           {% endif %}
         </tbody>
       </table>
-
-      <div class="d-flex justify-content-end mb-4">
-        <a class="btn btn-primary float-right" href="{{url_for('show_concepts', project_name=project.name.lower().replace(' ', '_'), stage_name=stage.name.lower().replace(' ', '_')) }}">Show full Concepts Catalog</a>
-      </div>
 
     {% endif %}
     </div>

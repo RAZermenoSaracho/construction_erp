@@ -1209,6 +1209,8 @@ def show_concepts(project_name, stage_name):
     
     project_name_title = project_name.replace('_', ' ').title()
     stage_name_title = stage_name.replace('_', ' ').title()
+
+    page_title = f"Concepts Catalog of stage {stage_name_title} of project {project_name_title}" 
     
     # Query the project and the stage
     requested_project = Project.query.filter_by(name=project_name_title).first()
@@ -1288,6 +1290,7 @@ def show_concepts(project_name, stage_name):
         company=COMPANY, 
         slogan=COMPANY_SLOGAN, 
         date=DATE, 
+        page_title=page_title, 
         project=requested_project, 
         stage=requested_stage, 
         filtering_form=self_filtering_table.form,
