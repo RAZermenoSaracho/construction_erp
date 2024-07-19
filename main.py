@@ -13,7 +13,7 @@ import shutil
 from sqlalchemy import inspect
 from wtforms import SelectField
 # Import your forms and database models.
-from forms import CreateProjectForm, CreateStageForm, RegisterForm, LoginForm, create_filtering_form, SelfFilteringTable, EditUserForm, create_new_record_form, SelectModelForm, CreatePhaseForm
+from forms import CreateProjectForm, CreateStageForm, RegisterForm, LoginForm, create_filtering_form, SelfFilteringTable, EditUserForm, create_new_record_form, SelectModelForm, CreatePhaseForm, ConceptCatalogSelector
 from models import db, Unit, Project, Stage, Phase, Concept, Tool, Job, Machinery, Material, MatGenerator, MoGenerator, MaqGenerator, HerGenerator, Locations, MaterialEntry, MaterialMove, MaterialExit, ToolEntry, ToolMove, ToolExit, Providor, MaqRental, Investor, jobs_history_employees, Employee, JobsHistory, Specialty, NewUser, User, Position, File
 import string
 
@@ -1198,6 +1198,108 @@ def edit_phase(phase_id):
         project=project,
         phase=phase_to_edit,
         is_edit=True
+    )
+
+
+
+# CONCEPTS MANAGEMENT
+@app.route("/project/<project_name>/stage/<stage_name>/concepts_catalog", methods=["GET", "POST"])
+@admin_required  # Require admin access in addition to login
+def show_concepts(project_name, stage_name):
+    
+    project_name_title = project_name.replace('_', ' ').title()
+    stage_name_title = stage_name.replace('_', ' ').title()
+    
+    # Query the project and the stage
+    requested_project = Project.query.filter_by(name=project_name_title).first()
+    requested_stage = Stage.query.filter_by(project_id=requested_project.id, name=stage_name_title).first()
+
+    phases = Phase.query.filter_by(stage_id=requested_stage.id).all()
+
+    data = []
+    for phase in phases:
+        concepts = Concept.query.filter_by(phase_id=phase.id).all()
+        for concept in concepts:
+
+            concept_mat_import = 0
+            mat_gens = MatGenerator.query.filter_by(concept_id=concept.id).all()
+            for mat_gen in mat_gens:
+                material = Material.query.filter_by(id=mat_gen.material_id).first()
+                amount = mat_gen.quantity * material.price
+                concept_mat_import = concept_mat_import + amount
+
+            concept_maq_import = 0
+            maq_gens = MaqGenerator.query.filter_by(concept_id=concept.id).all()
+            for maq_gen in maq_gens:
+                machinery = Machinery.query.filter_by(id=maq_gen.machinery_id).first()
+                amount = maq_gen.quantity * machinery.price
+                concept_maq_import = concept_maq_import + amount
+
+            concept_mo_import = 0
+            mo_gens = MoGenerator.query.filter_by(concept_id=concept.id).all()
+            for mo_gen in mo_gens:
+                job = Job.query.filter_by(id=mo_gen.job_id).first()
+                amount = mo_gen.quantity * job.price
+                concept_mo_import = concept_mo_import + amount
+
+            concept_her_import = 0.03 * concept_mo_import
+
+            direct_cost = concept_her_import + concept_maq_import + concept_mat_import + concept_mo_import
+
+
+            concepts_dict = {
+                'phase': phase.code,
+                'code': concept.code,
+                'name': concept.name,
+                'quantity': concept.quantity,
+                'unit': concept.unit,
+                'material unit price': concept_mat_import/concept.quantity,
+                'material total': concept_mat_import,
+                'machinery unit price': concept_mat_import/concept.quantity,
+                'machinery total': concept_mat_import,
+                'labour unit price': concept_mat_import/concept.quantity,
+                'labour total': concept_mat_import,
+                'tools unit price': concept_mat_import/concept.quantity,
+                'tools total': concept_mat_import,
+                'unit price': direct_cost/concept.quantity,
+                'direct cost': direct_cost,
+            }
+            data.append(concepts_dict)
+    
+    
+    # Convert the list of dictionaries to a Pandas DataFrame
+    concepts_table = pd.DataFrame(data)
+    
+    self_filtering_table = SelfFilteringTable(
+        df=concepts_table, 
+        columns=concepts_table.columns.tolist(),
+        column_types=[str, str, str, float, str, float, float, float, float, float, float, float, float, float, float]
+    )
+    
+    is_admin = False
+    if current_user.is_authenticated:
+        # Get the user from the database using the user ID stored in current_user
+        user = User.query.get(current_user.get_id())
+        # Check if the user is an admin
+        is_admin = user.is_admin
+
+    return render_template(
+        "concepts_catalog.html", 
+        company=COMPANY, 
+        slogan=COMPANY_SLOGAN, 
+        date=DATE, 
+        project=requested_project, 
+        stage=requested_stage, 
+        filtering_form=self_filtering_table.form,
+        table=self_filtering_table.table, 
+        filters_applied=len(self_filtering_table.filtering_inputs) > 0, 
+        logged_in=current_user.is_authenticated, 
+        is_admin=is_admin, 
+        user=current_user, 
+        sort_column=self_filtering_table.sort_column, 
+        sort_direction=self_filtering_table.sort_direction, 
+        columns=self_filtering_table.columns,
+        col_span=self_filtering_table.df.shape[1]
     )
 
 

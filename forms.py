@@ -65,6 +65,11 @@ def create_new_record_form(model):
     return CreateNewRecordForm()
 
 
+class ConceptCatalogSelector(FlaskForm):
+    project = SelectField("Project", validators=[DataRequired()])
+    stage = SelectField("Stage", validators=[DataRequired()])
+    select = SubmitField("Select")
+
 
 class CreateProjectForm(FlaskForm):
     name = StringField("Project Name", validators=[DataRequired()])
