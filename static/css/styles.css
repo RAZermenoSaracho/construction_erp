@@ -12,6 +12,38 @@
  */
 
 
+ header.masthead .stage_heading {
+  color: #fff;
+  text-align: center;
+}
+
+
+header.masthead .stage_heading .subheading {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0.75rem 0 2rem;
+  font-family: "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+
+header.masthead .stage_heading a {
+  color: #fff;
+  text-align: center;
+}
+
+
+header.masthead .concept_catalog_title {
+  color: #fff;
+  text-align: center;
+}
+
+header.masthead .concept_catalog_title a {
+  color: #fff;
+  text-align: center;
+}
+
+.title_link:hover {text-decoration: underline;}
+
 /* DROPDOWN MENU CSS */
 /* Dropdown Button */
 .dropbtn {

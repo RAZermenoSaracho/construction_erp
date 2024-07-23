@@ -13,7 +13,7 @@ import shutil
 from sqlalchemy import inspect
 from wtforms import SelectField
 # Import your forms and database models.
-from forms import CreateProjectForm, CreateStageForm, RegisterForm, LoginForm, create_filtering_form, SelfFilteringTable, EditUserForm, create_new_record_form, SelectModelForm, CreatePhaseForm, ConceptCatalogSelector
+from forms import CreateProjectForm, CreateStageForm, RegisterForm, LoginForm, create_filtering_form, SelfFilteringTable, EditUserForm, create_new_record_form, SelectModelForm, CreatePhaseForm, ConceptCatalogSelector, CreateConceptForm
 from models import db, Unit, Project, Stage, Phase, Concept, Tool, Job, Machinery, Material, MatGenerator, MoGenerator, MaqGenerator, HerGenerator, Locations, MaterialEntry, MaterialMove, MaterialExit, ToolEntry, ToolMove, ToolExit, Providor, MaqRental, Investor, jobs_history_employees, Employee, JobsHistory, Specialty, NewUser, User, Position, File
 import string
 
@@ -305,7 +305,7 @@ def create_new_record():
         is_admin = user.is_admin
 
     return render_template(
-        "new_record.html",
+        "new_record_x.html",
         company=COMPANY, 
         slogan=COMPANY_SLOGAN, 
         date=DATE, 
@@ -685,6 +685,7 @@ def show_project(project_name):
 @app.route("/new_project", methods=["GET", "POST"])
 @admin_required  # Require admin access in addition to login
 def add_new_project():
+    record_type = "project"
     form = CreateProjectForm()
     if form.validate_on_submit():
 
@@ -747,20 +748,22 @@ def add_new_project():
         is_admin = user.is_admin
     
     return render_template(
-        "new_project.html",
+        "new_record.html",
         company=COMPANY, 
         slogan=COMPANY_SLOGAN, 
         date=DATE, 
         form=form, 
         logged_in=current_user.is_authenticated, 
         is_admin=is_admin, 
-        user=current_user
+        user=current_user,
+        record_type = record_type
     )
 
 
 @app.route("/edit_project/<int:project_id>", methods=["GET", "POST"])
 @admin_required  # Require admin access in addition to login
 def edit_project(project_id):
+    record_type = "project"
     project_to_edit = db.get_or_404(Project, project_id)
     form = CreateProjectForm(obj=project_to_edit)
     form.submit.label.text = "Edit Project"
@@ -823,7 +826,7 @@ def edit_project(project_id):
         is_admin = user.is_admin
     
     return render_template(
-        "new_project.html",
+        "new_record.html",
         company=COMPANY, 
         slogan=COMPANY_SLOGAN, 
         date=DATE, 
@@ -832,7 +835,8 @@ def edit_project(project_id):
         is_admin=is_admin, 
         user=current_user,
         is_edit=True,
-        project = project_to_edit
+        project = project_to_edit,
+        record_type = record_type
     )
 
 
@@ -925,6 +929,7 @@ def show_stage(project_name, stage_name):
 @app.route("/new_stage/<int:project_id>", methods=["GET", "POST"])
 @admin_required  # Require admin access in addition to login
 def add_new_stage(project_id):
+    record_type = "stage"
     form = CreateStageForm()
     project = db.get_or_404(Project, project_id)
     
@@ -989,7 +994,7 @@ def add_new_stage(project_id):
         is_admin = user.is_admin
     
     return render_template(
-        "new_stage.html",
+        "new_record.html",
         company=COMPANY, 
         slogan=COMPANY_SLOGAN, 
         date=DATE, 
@@ -997,7 +1002,8 @@ def add_new_stage(project_id):
         logged_in=current_user.is_authenticated, 
         is_admin=is_admin, 
         user=current_user,
-        project=project
+        project=project,
+        record_type = record_type
     )
 
 
@@ -1005,6 +1011,7 @@ def add_new_stage(project_id):
 @app.route("/edit_stage/<int:stage_id>", methods=["GET", "POST"])
 @admin_required  # Require admin access in addition to login
 def edit_stage(stage_id):
+    record_type = "stage"
     stage_to_edit = db.get_or_404(Stage, stage_id)
     project = db.get_or_404(Project, stage_to_edit.project_id)
     form = CreateStageForm(obj=stage_to_edit)
@@ -1068,7 +1075,7 @@ def edit_stage(stage_id):
         is_admin = user.is_admin
     
     return render_template(
-        "new_stage.html",
+        "new_record.html",
         company=COMPANY, 
         slogan=COMPANY_SLOGAN, 
         date=DATE, 
@@ -1077,7 +1084,8 @@ def edit_stage(stage_id):
         is_admin=is_admin, 
         user=current_user,
         is_edit=True,
-        stage=stage_to_edit
+        stage=stage_to_edit,
+        record_type=record_type
     )
 
 
@@ -1105,6 +1113,7 @@ def delete_stage(stage_id):
 @app.route("/new_phase/<int:stage_id>", methods=["GET", "POST"])
 @admin_required  # Require admin access in addition to login
 def add_new_phase(stage_id):
+    record_type = "phase"
     form = CreatePhaseForm()
     stage = db.get_or_404(Stage, stage_id)
     project = db.get_or_404(Project, stage.project_id)
@@ -1140,7 +1149,7 @@ def add_new_phase(stage_id):
         is_admin = user.is_admin
     
     return render_template(
-        "new_phase.html",
+        "new_record.html",
         company=COMPANY, 
         slogan=COMPANY_SLOGAN, 
         date=DATE, 
@@ -1148,7 +1157,8 @@ def add_new_phase(stage_id):
         logged_in=current_user.is_authenticated, 
         is_admin=is_admin, 
         user=current_user,
-        project=project
+        project=project,
+        record_type=record_type
     )
 
 
@@ -1156,6 +1166,7 @@ def add_new_phase(stage_id):
 @app.route("/edit_phase/<int:phase_id>", methods=["GET", "POST"])
 @admin_required  # Require admin access in addition to login
 def edit_phase(phase_id):
+    record_type = "phase"
     phase_to_edit = db.get_or_404(Phase, phase_id)
     stage = db.get_or_404(Stage, phase_to_edit.stage_id)
     project = db.get_or_404(Project, stage.project_id)
@@ -1187,7 +1198,7 @@ def edit_phase(phase_id):
         is_admin = user.is_admin
     
     return render_template(
-        "new_phase.html",
+        "new_record.html",
         company=COMPANY, 
         slogan=COMPANY_SLOGAN, 
         date=DATE, 
@@ -1197,7 +1208,8 @@ def edit_phase(phase_id):
         user=current_user,
         project=project,
         phase=phase_to_edit,
-        is_edit=True
+        is_edit=True,
+        record_type=record_type
     )
 
 
@@ -1206,11 +1218,10 @@ def edit_phase(phase_id):
 @app.route("/project/<project_name>/stage/<stage_name>/concepts_catalog", methods=["GET", "POST"])
 @admin_required  # Require admin access in addition to login
 def show_concepts(project_name, stage_name):
-    
+    page_title = "Concepts Catalog" 
+
     project_name_title = project_name.replace('_', ' ').title()
     stage_name_title = stage_name.replace('_', ' ').title()
-
-    page_title = f"Concepts Catalog of stage {stage_name_title} of project {project_name_title}" 
     
     # Query the project and the stage
     requested_project = Project.query.filter_by(name=project_name_title).first()
@@ -1248,24 +1259,42 @@ def show_concepts(project_name, stage_name):
 
             direct_cost = concept_her_import + concept_maq_import + concept_mat_import + concept_mo_import
 
-
-            concepts_dict = {
-                'phase': phase.code,
-                'code': concept.code,
-                'name': concept.name,
-                'quantity': concept.quantity,
-                'unit': concept.unit,
-                'material unit price': concept_mat_import/concept.quantity,
-                'material total': concept_mat_import,
-                'machinery unit price': concept_mat_import/concept.quantity,
-                'machinery total': concept_mat_import,
-                'labour unit price': concept_mat_import/concept.quantity,
-                'labour total': concept_mat_import,
-                'tools unit price': concept_mat_import/concept.quantity,
-                'tools total': concept_mat_import,
-                'unit price': direct_cost/concept.quantity,
-                'direct cost': direct_cost,
-            }
+            if concept.quantity != 0:
+                concepts_dict = {
+                    'phase': phase.code,
+                    'code': concept.code,
+                    'name': concept.name,
+                    'quantity': concept.quantity,
+                    'unit': concept.unit.name,
+                    'material unit price': concept_mat_import/concept.quantity,
+                    'material total': concept_mat_import,
+                    'machinery unit price': concept_mat_import/concept.quantity,
+                    'machinery total': concept_mat_import,
+                    'labour unit price': concept_mat_import/concept.quantity,
+                    'labour total': concept_mat_import,
+                    'tools unit price': concept_mat_import/concept.quantity,
+                    'tools total': concept_mat_import,
+                    'unit price': direct_cost/concept.quantity,
+                    'direct cost': direct_cost,
+                }
+            else:
+                concepts_dict = {
+                    'phase': phase.code,
+                    'code': concept.code,
+                    'name': concept.name,
+                    'quantity': concept.quantity,
+                    'unit': concept.unit.name,
+                    'material unit price': 0,
+                    'material total': 0,
+                    'machinery unit price': 0,
+                    'machinery total': 0,
+                    'labour unit price': 0,
+                    'labour total': 0,
+                    'tools unit price': 0,
+                    'tools total': 0,
+                    'unit price': 0,
+                    'direct cost': 0,
+                }
             data.append(concepts_dict)
     
     
@@ -1305,6 +1334,71 @@ def show_concepts(project_name, stage_name):
         col_span=self_filtering_table.df.shape[1]
     )
 
+
+
+@app.route("/project/<project_name>/stage/<stage_name>/create_new_concept", methods=["GET", "POST"])
+@admin_required  # Require admin access in addition to login
+def new_concept(project_name, stage_name):
+    record_type = "concept"
+
+    project_name_title = project_name.replace('_', ' ').title()
+    stage_name_title = stage_name.replace('_', ' ').title()
+    
+    # Query the project and the stage
+    requested_project = Project.query.filter_by(name=project_name_title).first()
+    requested_stage = Stage.query.filter_by(project_id=requested_project.id, name=stage_name_title).first()
+
+    phases = Phase.query.filter_by(stage_id=requested_stage.id).all()
+    units = Unit.query.all()
+
+    form = CreateConceptForm()
+    form.unit.choices = [(unit.id, f'{unit.name}') for unit in units]
+    form.phase.choices = [(phase.id, f'{phase.name}') for phase in phases]
+
+    if form.validate_on_submit():
+        phase_id=form.phase.data
+
+        # Generate the concept code
+        phase = Phase.query.filter_by(id=phase_id).first()
+        existing_concepts = Concept.query.filter_by(phase_id=phase_id).all()
+        position = len(existing_concepts)
+        concept_code = f"{phase.code}-{position}"
+
+        # Create the new phase record in the database
+        new_concept = Concept(
+            name=form.name.data.title(),
+            description=form.description.data,
+            code=concept_code,
+            phase_id=phase_id,
+            unit_id=form.unit.data,
+            quantity=0
+        )
+
+        db.session.add(new_concept)
+        db.session.commit()
+            
+        return redirect(url_for("show_concepts", project_name=requested_project.name.lower().replace(' ', '_'), stage_name=requested_stage.name.lower().replace(' ', '_')))
+    
+    is_admin = False
+    if current_user.is_authenticated:
+        # Get the user from the database using the user ID stored in current_user
+        user = User.query.get(current_user.get_id())
+        # Check if the user is an admin
+        is_admin = user.is_admin
+
+    return render_template(
+        "new_record.html", 
+        company=COMPANY, 
+        slogan=COMPANY_SLOGAN, 
+        date=DATE, 
+        project=requested_project, 
+        stage=requested_stage, 
+        form=form,
+        logged_in=current_user.is_authenticated, 
+        is_admin=is_admin, 
+        user=current_user,
+        record_type = record_type
+    )
 
 
 # GENERAL PAGES

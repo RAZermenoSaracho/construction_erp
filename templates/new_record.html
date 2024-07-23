@@ -6,11 +6,31 @@
   <div class="container position-relative px-4 px-lg-5">
     <div class="row gx-4 gx-lg-5 justify-content-center">
       <div class="col-md-10 col-lg-8 col-xl-7">
-        <div class="page-heading">
-          {% if is_edit: %}
-          <h1>Edit a Record</h1>
-          {% else: %}
-          <h1>Create a Record</h1>
+        <div class="concept_catalog_title">
+          {% if record_type == 'project' %}
+            {% if is_edit: %}
+            <h1>Edit project:<br>"{{ project.name}}"</h1>
+            {% else: %}
+            <h1>Create a new project</h1>
+            {% endif %}
+          {% elif record_type == 'stage' %}
+            {% if is_edit %}
+            <h1>Edit Stage: <br>"{{ stage.name }}"</h1>
+            {% else %}
+            <h1>Create a Stage</h1>
+            {% endif %}
+          {% elif record_type == 'phase' %}
+            {% if is_edit %}
+            <h1>Edit Phase: <br>"{{ phase.name }}"</h1>
+            {% else %}
+            <h1>Create a Phase</h1>
+            {% endif %}
+          {% elif record_type == 'concept' %}
+            {% if is_edit %}
+            <h1>Edit Concept: <br>"{{ concept.name }}"</h1>
+            {% else %}
+            <h1>Create a Concept</h1>
+            {% endif %}
           {% endif %}
         </div>
       </div>
@@ -22,9 +42,6 @@
   <div class="container">
     <div class="row">
       <div class="col-lg-8 col-md-10 mx-auto">
-        {% if selected_model != 'None' %}
-        <h2 class="post-title">In model {{selected_model}}</h2>
-        {% endif %}
         {% with messages = get_flashed_messages() %}
         {% if messages %}
           {% for message in messages %}

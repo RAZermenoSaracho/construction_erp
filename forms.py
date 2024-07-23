@@ -97,6 +97,14 @@ class CreatePhaseForm(FlaskForm):
     submit = SubmitField("Create Phase")
 
 
+class CreateConceptForm(FlaskForm):
+    name = StringField("Concept Name", validators=[DataRequired()])
+    description = CKEditorField("Concept's Description")
+    unit = SelectField("Unit", validators=[DataRequired()])
+    phase = SelectField("Parent Phase", validators=[DataRequired()])
+    submit = SubmitField("Create Phase")
+
+
 # TODO: Create a RegisterForm to register new users
 class RegisterForm(FlaskForm):
     email = StringField("Email", validators=[DataRequired()])

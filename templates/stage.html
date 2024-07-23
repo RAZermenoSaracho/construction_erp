@@ -8,8 +8,8 @@
   <div class="container position-relative px-4 px-lg-5">
     <div class="row gx-4 gx-lg-5 justify-content-center">
       <div class="col-md-10 col-lg-8 col-xl-7">
-        <div class="site-heading">
-          <h1>{{ stage.name }} from {{ project.name }}</h1>
+        <div class="stage_heading">
+          <h1>Stage {{ stage.name }} from project <a class="title_link" href="{{ url_for('show_project', project_name=project.name.lower().replace(' ', '_')) }}">{{ project.name }}</a></h1></h1>
           <h2 class="subheading">{{ stage.slogan }}</h2>
           <span class="meta">
             By
@@ -27,7 +27,7 @@
     <div class="row gx-4 gx-lg-5 justify-content-center">
       <div class="col-md-10 col-lg-8 col-xl-7">
         <div class="post-heading">
-          <h1>{{ stage.name }} from {{ project.name }}</h1>
+          <h1>Stage {{ stage.name }} from project <a class="title_link" href="{{ url_for('show_project', project_name=project.name.lower().replace(' ', '_')) }}">{{ project.name }}</a></h1></h1>
           <h2 class="subheading">{{ stage.slogan }}</h2>
           <span class="meta">
             By

@@ -79,8 +79,8 @@ class Concept(db.Model):
     __tablename__ = "concepts"
     id = mapped_column(Integer, primary_key=True)
     name = mapped_column(String(250), nullable=False)
-    description = mapped_column(String(250), nullable=False)
-    quantity = mapped_column(Float(250), nullable=False)
+    description = mapped_column(String(250))
+    quantity = mapped_column(Float(250))
     unit_id = mapped_column(Integer, ForeignKey('units.id'), nullable=False)
     unit = relationship('Unit')
     phase_id = mapped_column(Integer, ForeignKey('phases.id'), nullable=False)

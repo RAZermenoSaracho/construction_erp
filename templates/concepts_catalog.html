@@ -7,8 +7,10 @@
   <div class="container position-relative px-4 px-lg-5">
     <div class="row gx-4 gx-lg-5 justify-content-center">
       <div class="col-md-10 col-lg-8 col-xl-7">
-        <div class="site-heading">
-          <h1>{{ page_title }}</h1>
+        <div class="concept_catalog_title">
+          <h1>{{ page_title }} of stage 
+            <a class="title_link" href="{{ url_for('show_stage', project_name=project.name.lower().replace(' ', '_'), stage_name=stage.name.lower().replace(' ', '_')) }}">{{ stage.name }}</a>
+             of project <a class="title_link" href="{{ url_for('show_project', project_name=project.name.lower().replace(' ', '_')) }}">{{ project.name }}</a></h1>
         </div>
       </div>
     </div>
@@ -54,6 +56,14 @@
         {% endif %}
       {% endwith %}
     </div>
+
+    <form method="POST" action="{{ url_for('new_concept', project_name=project.name.lower().replace(' ', '_'), stage_name=stage.name.lower().replace(' ', '_'))}}">
+      <button type="submit" class="btn btn-primary" name="add_concept_form">Create a new concept</button>
+    </form>
+  </div>
+</div>
+<div>
+  <div>
     <table class="table">
       <thead>
         <tr>

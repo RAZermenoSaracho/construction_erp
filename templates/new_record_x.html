@@ -1,5 +1,4 @@
-{% from "bootstrap5/form.html" import render_form %}
-{% block content %}
+{% from "bootstrap5/form.html" import render_form %} {% block content %} 
 {% include "header.html" %}
 
 <!-- Page Header -->
@@ -8,10 +7,10 @@
     <div class="row gx-4 gx-lg-5 justify-content-center">
       <div class="col-md-10 col-lg-8 col-xl-7">
         <div class="page-heading">
-          {% if is_edit %}
-          <h1>Edit Phase: <br>"{{ phase.name }}"</h1>
-          {% else %}
-          <h1>Create a Phase</h1>
+          {% if is_edit: %}
+          <h1>Edit a Record</h1>
+          {% else: %}
+          <h1>Create a Record</h1>
           {% endif %}
         </div>
       </div>
@@ -23,6 +22,9 @@
   <div class="container">
     <div class="row">
       <div class="col-lg-8 col-md-10 mx-auto">
+        {% if selected_model != 'None' %}
+        <h2 class="post-title">In model {{selected_model}}</h2>
+        {% endif %}
         {% with messages = get_flashed_messages() %}
         {% if messages %}
           {% for message in messages %}
@@ -36,5 +38,5 @@
     </div>
   </div>
 </main>
-{% include "footer.html" %}
+{% include "footer.html" %} 
 {% endblock %}
