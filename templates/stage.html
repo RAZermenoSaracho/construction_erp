@@ -78,7 +78,7 @@
         {% with messages = get_flashed_messages() %}
           {% if messages %}
             {% for message in messages %}
-              <p>{{ message | safe }}</p>
+              <p style="color: red;">{{ message | safe }}</p>
             {% endfor %}
           {% endif %}
         {% endwith %}
@@ -117,6 +117,9 @@
               </div>
             </th>
             {% endfor %}
+            <th>
+              Delete
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -126,6 +129,7 @@
               {% for column in columns %}
               <td><a href="{{url_for('edit_phase', phase_id=row['id'])}}">{{ row[column] | safe }}</a></td>
               {% endfor %}
+              <td><a href="{{url_for('delete_phase', phase_id=row['id'])}}">✘</a></td>
             </tr>
           {% endfor %}
           {% else %}
@@ -143,7 +147,7 @@
 
 <!-- Post Content -->
 <article>
-  <div class="container px-4 px-lg-5">
+  <div class="container px-4 px-lg-5 mt-5">
     <div class="row gx-4 gx-lg-5 justify-content-center">
       <div class="col-md-10 col-lg-8 col-xl-7">
         <h3 class="mb-5">Clients' content</h3>

@@ -64,7 +64,7 @@
 </div>
 <div>
   <div>
-    <table class="table">
+    <table class="table text-xs">
       <thead>
         <tr>
           {% for column in columns %}
@@ -77,11 +77,11 @@
                 <form method="POST">
                   <input type="hidden" name="sort_column" value="{{ column }}">
                   {% if sort_column == column and sort_direction == 'asc' %}
-                  <button type="submit" class="btn btn-primary btn-sm" name="sort_direction" value="desc">▲</button>
+                  <button type="submit" class="btn btn-primary btn-xs" name="sort_direction" value="desc">▲</button>
                   {% elif sort_column == column and sort_direction == 'desc' %}
-                  <button type="submit" class="btn btn-primary btn-sm" name="sort_direction" value="asc">▼</button>
+                  <button type="submit" class="btn btn-primary btn-xs" name="sort_direction" value="asc">▼</button>
                   {% else %}
-                  <button type="submit" class="btn btn-primary btn-sm" name="sort_direction" value="asc">—</button>
+                  <button type="submit" class="btn btn-primary btn-xs" name="sort_direction" value="asc">—</button>
                   {% endif %}
                 </form>
               </div>

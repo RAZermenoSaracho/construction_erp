@@ -16,6 +16,8 @@ from wtforms import SelectField
 from forms import CreateProjectForm, CreateStageForm, RegisterForm, LoginForm, create_filtering_form, SelfFilteringTable, EditUserForm, create_new_record_form, SelectModelForm, CreatePhaseForm, ConceptCatalogSelector, CreateConceptForm
 from models import db, Unit, Project, Stage, Phase, Concept, Tool, Job, Machinery, Material, MatGenerator, MoGenerator, MaqGenerator, HerGenerator, Locations, MaterialEntry, MaterialMove, MaterialExit, ToolEntry, ToolMove, ToolExit, Providor, MaqRental, Investor, jobs_history_employees, Employee, JobsHistory, Specialty, NewUser, User, Position, File
 import string
+from sqlalchemy.exc import IntegrityError
+
 
 COMPANY = 'Vive RAMZSA'
 COMPANY_SLOGAN = 'Lujo, sostenibilidad e innovacion, juntos en cada proyecto.'
@@ -194,9 +196,8 @@ def edit_profile(user_id):
 
 
 
-
-
-
+# Esta parte del codigo esta bien rara, probablemente nos desahagmos de esto, 
+# pero por ahora nos sirve para completar algunos flujos.
 @app.route("/create_new_record", methods=["GET", "POST"])
 @login_required
 def create_new_record():
@@ -315,9 +316,6 @@ def create_new_record():
         is_admin=is_admin, 
         user=current_user
     )
-
-
-
 
 
 
@@ -893,7 +891,7 @@ def show_stage(project_name, stage_name):
     phases_table = pd.DataFrame(data)
     
     self_filtering_table = SelfFilteringTable(
-        df=phases_table, 
+        df=phases_table,
         columns=['id', 'code', 'name', 'description'],
         column_types=[int, str, str, str]
     )
@@ -1211,6 +1209,28 @@ def edit_phase(phase_id):
         is_edit=True,
         record_type=record_type
     )
+
+
+
+@app.route("/delete_phase/<int:phase_id>")
+@admin_required  # Require admin access in addition to login
+def delete_phase(phase_id):
+    phase_to_delete = db.get_or_404(Phase, phase_id)
+
+    stage = db.get_or_404(Stage, phase_to_delete.stage_id)
+    stage_name = stage.name.lower().replace(' ', '_')
+
+    project = db.get_or_404(Project, stage.project_id)
+    project_name = project.name.lower().replace(' ', '_')
+    
+    try:
+        # Attempt to delete the phase
+        db.session.delete(phase_to_delete)
+        db.session.commit()
+    except IntegrityError:
+        flash("Cannot delete this phase as it is associated with existing concepts.", "danger")
+
+    return redirect(url_for('show_stage', project_name=project_name, stage_name=stage_name))
 
 
 
